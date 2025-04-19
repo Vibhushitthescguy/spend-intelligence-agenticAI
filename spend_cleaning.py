@@ -64,7 +64,7 @@ def summarize_categories(df):
 
 def generate_insights(frag_df, price_var_df, category_spend):
     insights = []
-    print("\n i have installed github desktop")
+
     frag_count = frag_df.shape[0]
     high_var_count = price_var_df[price_var_df['variance_pct'] > 10].shape[0]
     top_cat = category_spend.iloc[0]

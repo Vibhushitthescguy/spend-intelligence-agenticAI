@@ -5,6 +5,7 @@ import plotly.express as px
 from spend_cleaning import clean_data, analyze_fragmentation, analyze_price_variance, summarize_categories, generate_insights
 from genai_summary import generate_procurement_summary
 import openai
+openai.api_key = "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"
 import os
 
 # Page config + styling
@@ -116,7 +117,7 @@ if uploaded_file:
         risk_text = risky_cats[['material_group', 'unique_suppliers']].to_dict(orient='records')
         prompt = f"You are a senior procurement strategist. Review these high-risk material groups and write a 5-bullet strategic recommendation:\n{risk_text}"
         gpt_response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a senior procurement advisor."},
                 {"role": "user", "content": prompt}
@@ -162,7 +163,7 @@ if uploaded_file:
         {user_question}
         """
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a procurement data assistant."},
                 {"role": "user", "content": chat_prompt}

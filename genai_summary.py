@@ -1,5 +1,6 @@
 # genai_summary.py
 import openai
+openai.api_key = "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"
 import os
 
 openai.api_key = os.getenv("OPENAI_API_KEY")

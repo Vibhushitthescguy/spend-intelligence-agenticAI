@@ -119,7 +119,7 @@ if uploaded_file:
         st.download_button("⬇️ Download Risk Categories", risky_cats.to_csv(index=False), file_name="high_risk_categories.csv")
         risk_text = risky_cats[['material_group', 'unique_suppliers']].to_dict(orient='records')
         prompt = f"You are a senior procurement strategist. Review these high-risk material groups and write a 5-bullet strategic recommendation:\n{risk_text}"
-        gpt_response = openai.ChatCompletion.create(
+        gpt_response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a senior procurement advisor."},

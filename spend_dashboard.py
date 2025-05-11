@@ -7,8 +7,9 @@ import os
 from spend_cleaning import clean_data, analyze_fragmentation, analyze_price_variance, summarize_categories, generate_insights
 from genai_summary import generate_procurement_summary
 from dotenv import load_dotenv
+from openai import OpenAI
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Page config + styling
 st.set_page_config(page_title="GenAI-Powered Spend Intelligence", layout="wide")
@@ -190,7 +191,7 @@ if uploaded_file:
         their total spend, and any notable patterns. Be concise but informative.
         """
     
-        response = openai.ChatCompletion.create(
+        response =client.Chat.Completion.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a procurement data assistant."},

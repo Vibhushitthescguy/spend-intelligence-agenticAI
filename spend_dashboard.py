@@ -2,11 +2,13 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import openai
+import os
 from spend_cleaning import clean_data, analyze_fragmentation, analyze_price_variance, summarize_categories, generate_insights
 from genai_summary import generate_procurement_summary
-import openai
-openai.api_key = "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"
-import os
+from dotenv import load_dotenv
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Page config + styling
 st.set_page_config(page_title="GenAI-Powered Spend Intelligence", layout="wide")

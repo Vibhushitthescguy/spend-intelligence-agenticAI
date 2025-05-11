@@ -3,8 +3,7 @@ import openai
 from dotenv import load_dotenv
 load_dotenv()
 import os
-
-openai.api_key = os.getenv("openai.api_key")
+openai.api_key = os.getenv("OPENAI_API_KEY")
 def generate_procurement_summary(insights, top_variance_df, top_fragment_df):
     top_var_items = top_variance_df[['short_text', 'variance_pct']].head(5).to_dict(orient='records')
     top_frag_items = top_fragment_df[['short_text', 'unique_suppliers']].head(5).to_dict(orient='records')

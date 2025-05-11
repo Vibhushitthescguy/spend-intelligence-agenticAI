@@ -5,7 +5,7 @@ import plotly.express as px
 from spend_cleaning import clean_data, analyze_fragmentation, analyze_price_variance, summarize_categories, generate_insights
 from genai_summary import generate_procurement_summary
 import openai
-openai.api_key = "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"
+openai.api_key = "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"
 import os
 
 # Page config + styling
@@ -33,7 +33,7 @@ st.markdown("""
 
 # Sidebar Branding
 st.markdown("# 🤖 GenAI-Powered Spend Intelligence Dashboard")
-st.markdown("Delivering smart procurement insights — powered by GPT-4, Streamlit, and automation.")
+st.markdown("Delivering smart procurement insights — powered by GenAI, Streamlit, and automation.")
 st.markdown("---")
 
 uploaded_file = st.file_uploader("📥 Upload your PO Data (Excel)", type=["xlsx"])
@@ -59,11 +59,11 @@ if uploaded_file:
 
     st.markdown("---")
     st.markdown("## 📊 Spend Overview")
-    kpi1, kpi2, kpi3 = st.columns(3)
+    kpi1, kpi2, kpi3, kpi4 = st.columns(4)
     kpi1.metric("Total Spend (AED)", f"{df['total_spend'].sum():,.0f}")
-    kpi2.metric("Unique Materials", df['material'].nunique())
+    kpi2.metric("Total PO issued", df['purchasing_document'].nunique())
     kpi3.metric("Total Suppliers", df['supplier'].nunique())
-
+    kpi4.metric("Unique Materials", df['material'].nunique())
     st.markdown("---")
     st.markdown("## 📦 Top Categories by Spend")
     fig_cat = px.bar(cat_df.sort_values(by='total_spend', ascending=False).head(10),
@@ -148,12 +148,34 @@ if uploaded_file:
     with st.expander("📊 Category Spend Table"):
         st.dataframe(cat_df)
 
+    # Updated "Ask the Spend Agent" section with fixed indentation
     st.markdown("## 💬 Ask the Spend Agent")
     user_question = st.text_input("Ask a question about this spend data:")
     if user_question:
+        # Create a more comprehensive context including category and supplier information
+        category_data = cat_df.to_dict(orient='records')
+    
+        # Get suppliers by category (this is what was missing)
+        suppliers_by_category = {}
+        for category in df['material_group'].unique():
+            cat_suppliers = df[df['material_group'] == category]['supplier'].unique().tolist()
+            cat_spend = df[df['material_group'] == category]['total_spend'].sum()
+            suppliers_by_category[category] = {
+                'suppliers': cat_suppliers,
+                'total_spend': float(cat_spend),
+                'supplier_count': len(cat_suppliers)
+            }
+    
+        # Enhanced prompt with complete data
         chat_prompt = f"""
         You are a helpful procurement analyst. Based on these insights:
         {insights}
+
+        Detailed category data:
+        {category_data}
+        
+        Suppliers by category data:
+        {suppliers_by_category}
 
         And data flags:
         - Top price variance items: {var_df[['short_text', 'variance_pct']].head(5).to_dict(orient='records')}
@@ -161,7 +183,11 @@ if uploaded_file:
 
         Answer the user's question:
         {user_question}
+        
+        If the question is about suppliers in a specific category, provide the list of suppliers in that category,
+        their total spend, and any notable patterns. Be concise but informative.
         """
+    
         response = openai.ChatCompletion.create(
             model="gpt-4o",
             messages=[
@@ -170,11 +196,25 @@ if uploaded_file:
             ]
         )
         st.markdown(f"**🗨️ GPT Response:** {response['choices'][0]['message']['content']}")
+        
+        # Add option to view relevant data for transparency
+        with st.expander("View data used to answer this question"):
+            if "supplier" in user_question.lower() and "category" in user_question.lower():
+                # Extract category name from question if possible
+                for category in df['material_group'].unique():
+                    if category.lower() in user_question.lower():
+                        st.subheader(f"Suppliers in {category} category")
+                        supplier_data = df[df['material_group'] == category].groupby('supplier')['total_spend'].sum().reset_index()
+                        supplier_data = supplier_data.sort_values('total_spend', ascending=False)
+                        st.dataframe(supplier_data)
+                        fig = px.pie(supplier_data, values='total_spend', names='supplier', 
+                                    title=f'Supplier Distribution in {category}')
+                        st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("""
     <hr style='margin-top: 2rem;'>
     <p style='text-align:center; font-size:0.8rem;'>
-        Built with ❤️ by Vibhushit • Powered by GPT-4 + Streamlit
+        Built with ❤️ by Vibhushit • Powered by GenAI + Streamlit
     </p>
     """, unsafe_allow_html=True)
 

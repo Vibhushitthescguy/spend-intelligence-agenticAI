@@ -1,6 +1,6 @@
 # genai_summary.py
 import openai
-openai.api_key = "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"
+openai.api_key = "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"
 
 def generate_procurement_summary(insights, top_variance_df, top_fragment_df):
     top_var_items = top_variance_df[['short_text', 'variance_pct']].head(5).to_dict(orient='records')

@@ -54,8 +54,8 @@ if uploaded_file:
     cat_df = summarize_categories(df)
     insights = generate_insights(frag_df, var_df, cat_df)
 
-    st.markdown("## 🧠 Strategic GPT Insights")
-    if st.button("🧠 Generate Summary with GPT"):
+    st.markdown("## 🧠 Strategic Insights")
+    if st.button("🧠 Generate Summary with AI"):
         ai_summary = generate_procurement_summary(insights, var_df, frag_df)
         st.markdown(ai_summary)
         st.download_button("⬇️ Download GPT Summary", ai_summary.encode('utf-8'), file_name="SpendGPT_Summary.txt")
@@ -127,7 +127,7 @@ if uploaded_file:
             ]
         )
         st.markdown("### 🧠 GPT Recommendations for High-Risk Groups")
-        st.markdown(gpt_response['choices'][0]['message']['content'])
+        st.markdown(gpt_response.choices[0].message.content)
     else:
         st.success("✅ No high-risk fragmentation found across categories.")
 
@@ -191,14 +191,14 @@ if uploaded_file:
         their total spend, and any notable patterns. Be concise but informative.
         """
     
-        response =client.Chat.Completion.create(
+        response =client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a procurement data assistant."},
                 {"role": "user", "content": chat_prompt}
             ]
         )
-        st.markdown(f"**🗨️ GPT Response:** {response['choices'][0]['message']['content']}")
+        st.markdown(f"**🗨️ GPT Response:** {response.choices[0].message.content}")
         
         # Add option to view relevant data for transparency
         with st.expander("View data used to answer this question"):

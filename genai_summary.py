@@ -3,8 +3,8 @@ import openai
 from dotenv import load_dotenv
 load_dotenv()
 import os
-from openai import OpenAI
 load_dotenv()
+from openai import OpenAI
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 def generate_procurement_summary(insights, top_variance_df, top_fragment_df):
     top_var_items = top_variance_df[['short_text', 'variance_pct']].head(5).to_dict(orient='records')
@@ -26,4 +26,4 @@ def generate_procurement_summary(insights, top_variance_df, top_fragment_df):
             {"role": "user", "content": prompt}
         ]
     )
-    return response['choices'][0]['message']['content']
+    return response.choices[0].message.content
